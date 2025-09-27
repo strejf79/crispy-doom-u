@@ -309,7 +309,7 @@ void I_Error (const char *error, ...)
     char msgbuf[512];
     va_list argptr;
     atexit_listentry_t *entry;
-    boolean exit_gui_popup;
+    // boolean exit_gui_popup; // Unused variable
 
     if (already_quitting)
     {

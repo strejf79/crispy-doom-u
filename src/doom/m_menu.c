@@ -1022,15 +1022,15 @@ static boolean StartsWithMapIdentifier (char *str)
     M_ForceUppercase(str);
 
     if (strlen(str) >= 4 &&
-        str[0] == 'E' && isdigit(str[1]) &&
-        str[2] == 'M' && isdigit(str[3]))
+        str[0] == 'E' && isdigit((unsigned char)str[1]) &&
+        str[2] == 'M' && isdigit((unsigned char)str[3]))
     {
         return true;
     }
 
     if (strlen(str) >= 5 &&
         str[0] == 'M' && str[1] == 'A' && str[2] == 'P' &&
-        isdigit(str[3]) && isdigit(str[4]))
+        isdigit((unsigned char)str[3]) && isdigit((unsigned char)str[4]))
     {
         return true;
     }
@@ -1659,6 +1659,7 @@ void M_Options(int choice)
 }
 
 // [crispy] correctly handle inverted y-axis
+__attribute__((unused))
 static void M_Mouse(int choice)
 {
     if (mouseSensitivity_y < 0)
@@ -1815,7 +1816,7 @@ int     quitsounds2[8] =
 
 void M_QuitResponse(int key)
 {
-    extern int show_endoom;
+    // extern int show_endoom; // Unused variable
 
     if (key != key_menu_confirm)
 	return;

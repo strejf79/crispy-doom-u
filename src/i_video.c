@@ -173,7 +173,7 @@ int force_software_renderer = false;
 // Time to wait for the screen to settle on startup before starting the
 // game (ms)
 
-static int startup_delay = 1000;
+static int startup_delay __attribute__((unused)) = 1000;
 
 // Grab the mouse? (int type for config code). nograbmouse_override allows
 // this to be temporarily disabled via the command line.
@@ -599,6 +599,7 @@ static void UpdateGrab(void)
     currently_grabbed = grab;
 }
 
+__attribute__((unused))
 static void LimitTextureSize(int *w_upscale, int *h_upscale)
 {
     SDL_RendererInfo rinfo;
@@ -1324,6 +1325,7 @@ void I_CheckIsScreensaver(void)
     }
 }
 
+__attribute__((unused))
 static void SetSDLVideoDriver(void)
 {
     // Allow a default value for the SDL video driver to be specified
