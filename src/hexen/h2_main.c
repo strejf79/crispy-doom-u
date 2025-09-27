@@ -94,6 +94,18 @@ static void CrispyDrawStats(void); // [crispy]
 
 GameMode_t gamemode;
 static const char *gamedescription;
+
+// Global flag for clean exit request from in-game quit menu
+#ifdef __WIIU__
+static boolean g_request_app_exit = false;
+
+// Function to request clean exit from in-game quit menu
+void D_RequestAppExit(void)
+{
+    g_request_app_exit = true;
+}
+#endif // __WIIU__
+
 char *iwadfile;
 static char demolumpname[9];    // Demo lump to start playing.
 boolean nomonsters;             // checkparm of -nomonsters
@@ -933,6 +945,39 @@ void H2_GameLoop(void)
     I_RegisterWindowIcon(hexen_icon_data, hexen_icon_w, hexen_icon_h);
     I_InitGraphics();
 
+#ifdef __WIIU__
+    // Use wut's WHBProcIsRunning wrapper for simplified ProcUI handling
+    while (WHBProcIsRunning() && !g_request_app_exit)
+    {
+        // Frame syncronous IO operations
+        I_StartFrame();
+
+        // Process one or more tics
+        // Will run at least one tic
+        TryRunTics();
+
+        // Move positional sounds
+        S_UpdateSounds(players[displayplayer].mo);
+
+        DrawAndBlit();
+
+        // [crispy] post-rendering function pointer to apply config changes
+        // that affect rendering and that are better applied after the current
+        // frame has finished rendering
+        if (crispy->post_rendering_hook)
+        {
+            crispy->post_rendering_hook();
+            crispy->post_rendering_hook = NULL;
+        }
+    }
+    
+    // Clean shutdown after main loop exits
+    if (g_request_app_exit)
+    {
+        I_Quit_Real(); // Call the real quit function for proper cleanup
+        WHBProcShutdown();
+    }
+#else
     while (1)
     {
         // Frame syncronous IO operations
@@ -956,6 +1001,7 @@ void H2_GameLoop(void)
             crispy->post_rendering_hook = NULL;
         }
     }
+#endif // __WIIU__
 }
 
 //==========================================================================

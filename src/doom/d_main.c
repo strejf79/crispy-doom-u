@@ -102,6 +102,17 @@ void D_DoomLoop (void);
 
 static char *gamedescription;
 
+// Global flag for clean exit request from in-game quit menu
+#ifdef __WIIU__
+static boolean g_request_app_exit = false;
+
+// Function to request clean exit from in-game quit menu
+void D_RequestAppExit(void)
+{
+    g_request_app_exit = true;
+}
+#endif // __WIIU__
+
 // Location where savegames are stored
 
 char *          savegamedir;
@@ -617,9 +628,16 @@ void D_DoomLoop (void)
 #ifdef __WIIU__
     // Use wut's WHBProcIsRunning wrapper for simplified ProcUI handling
     // Standard WHB pattern - let SDL and WHB handle everything
-    while (WHBProcIsRunning())
+    while (WHBProcIsRunning() && !g_request_app_exit)
     {
         D_RunFrame();
+    }
+    
+    // Clean shutdown after main loop exits
+    if (g_request_app_exit)
+    {
+        I_Quit_Real(); // Call the real quit function for proper cleanup
+        WHBProcShutdown();
     }
 #else
     while (1)

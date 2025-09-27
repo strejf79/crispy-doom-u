@@ -61,6 +61,17 @@
 GameMode_t gamemode = indetermined;
 const char *gamedescription = "unknown";
 
+// Global flag for clean exit request from in-game quit menu
+#ifdef __WIIU__
+static boolean g_request_app_exit = false;
+
+// Function to request clean exit from in-game quit menu
+void D_RequestAppExit(void)
+{
+    g_request_app_exit = true;
+}
+#endif // __WIIU__
+
 boolean nomonsters;             // checkparm of -nomonsters
 boolean respawnparm;            // checkparm of -respawn
 boolean debugmode;              // checkparm of -debug
@@ -392,6 +403,38 @@ void D_DoomLoop(void)
 
     main_loop_started = true;
 
+#ifdef __WIIU__
+    // Use wut's WHBProcIsRunning wrapper for simplified ProcUI handling
+    while (WHBProcIsRunning() && !g_request_app_exit)
+    {
+        // Frame syncronous IO operations
+        I_StartFrame();
+
+        // Process one or more tics
+        // Will run at least one tic
+        TryRunTics();
+
+        // Move positional sounds
+        S_UpdateSounds(players[consoleplayer].mo);
+        D_Display();
+
+        // [crispy] post-rendering function pointer to apply config changes
+        // that affect rendering and that are better applied after the current
+        // frame has finished rendering
+        if (crispy->post_rendering_hook)
+        {
+            crispy->post_rendering_hook();
+            crispy->post_rendering_hook = NULL;
+        }
+    }
+    
+    // Clean shutdown after main loop exits
+    if (g_request_app_exit)
+    {
+        I_Quit_Real(); // Call the real quit function for proper cleanup
+        WHBProcShutdown();
+    }
+#else
     while (1)
     {
         // Frame syncronous IO operations
@@ -414,6 +457,7 @@ void D_DoomLoop(void)
             crispy->post_rendering_hook = NULL;
         }
     }
+#endif // __WIIU__
 }
 
 /*

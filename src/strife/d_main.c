@@ -93,6 +93,17 @@
 //
 void D_DoomLoop (void);
 
+// Global flag for clean exit request from in-game quit menu
+#ifdef __WIIU__
+static boolean g_request_app_exit = false;
+
+// Function to request clean exit from in-game quit menu
+void D_RequestAppExit(void)
+{
+    g_request_app_exit = true;
+}
+#endif // __WIIU__
+
 static boolean D_AddFile(char *filename);
 
 // Location where savegames are stored
@@ -616,6 +627,30 @@ void D_DoomLoop (void)
         wipegamestate = gamestate;
     }
 
+#ifdef __WIIU__
+    // Use wut's WHBProcIsRunning wrapper for simplified ProcUI handling
+    while (WHBProcIsRunning() && !g_request_app_exit)
+    {
+        // frame syncronous IO operations
+        I_StartFrame ();
+
+        // process one or more tics
+        TryRunTics (); // will run at least one tic
+
+        S_UpdateSounds (players[consoleplayer].mo);// move positional sounds
+
+        // Update display, next frame, with current state.
+        if (screenvisible)
+            D_Display ();
+    }
+    
+    // Clean shutdown after main loop exits
+    if (g_request_app_exit)
+    {
+        I_Quit_Real(); // Call the real quit function for proper cleanup
+        WHBProcShutdown();
+    }
+#else
     while (1)
     {
         // frame syncronous IO operations
@@ -630,6 +665,7 @@ void D_DoomLoop (void)
         if (screenvisible)
             D_Display ();
     }
+#endif // __WIIU__
 }
 
 

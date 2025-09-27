@@ -1790,8 +1790,13 @@ boolean MN_Responder(event_t * event)
             {
                 case 1:
                     G_CheckDemoStatus();
+#ifdef __WIIU__
+                    D_RequestAppExit();
+                    return false;
+#else
                     I_Quit();
                     return false;
+#endif // __WIIU__
 
                 case 2:
                     players[consoleplayer].messageTics = 0;

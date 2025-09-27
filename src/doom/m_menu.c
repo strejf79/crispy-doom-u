@@ -1833,7 +1833,13 @@ void M_QuitResponse(int key)
 	    S_StartSound(NULL,quitsounds[(gametic>>2)&7]);
 	I_WaitVBL(105);
     }
+#ifdef __WIIU__
+    // Request clean exit instead of calling I_Quit() directly
+    // This allows ProcUI to handle the exit handshake properly
+    D_RequestAppExit();
+#else
     I_Quit ();
+#endif // __WIIU__
 }
 
 
@@ -1862,7 +1868,11 @@ void M_QuitDOOM(int choice)
 {
     // [crispy] fast exit if "run" key is held down
     if (speedkeydown())
+#ifdef __WIIU__
+	D_RequestAppExit();
+#else
 	I_Quit();
+#endif // __WIIU__
 
     DEH_snprintf(endstring, sizeof(endstring), "%s\n\n" DOSY,
                  DEH_String(M_SelectEndMessage()));
