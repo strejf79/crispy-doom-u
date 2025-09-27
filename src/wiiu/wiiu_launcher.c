@@ -177,9 +177,8 @@ void launcherRun()
     // Small delay to ensure the clear frames are displayed
     OSSleepTicks(OSMillisecondsToTicks(50));
 
-    // Disable OSScreen before freeing buffers to prevent GPU from reading freed memory
-    OSScreenEnableEx(SCREEN_TV, false);
-    OSScreenEnableEx(SCREEN_DRC, false);
+    // Shutdown OSScreen before freeing buffers to prevent GPU from reading freed memory
+    // Don't disable displays - let SDL/GX2 take over them when the game starts
     OSScreenShutdown();
 
     // Now it's safe to free the buffers
