@@ -60,6 +60,16 @@ int WIDESCREENDELTA; // [crispy] horizontal widescreen offset
 static SDL_Window *screen;
 static SDL_Renderer *renderer;
 
+// Helper function to present a stable black frame during blocking operations
+void I_PresentBlackFrame(void) {
+    if (renderer != NULL) {
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+        SDL_RenderClear(renderer);
+        SDL_RenderPresent(renderer);
+        SDL_RenderPresent(renderer); // second call ensures both TV and GamePad buffers are valid
+    }
+}
+
 // Window title
 
 static const char *window_title = "";

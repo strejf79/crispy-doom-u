@@ -1688,6 +1688,10 @@ void D_DoomMain (void)
     modifiedgame = false;
 
     DEH_printf("W_Init: Init WADfiles.\n");
+#ifdef __WIIU__
+    // Present stable black frame before blocking WAD load to prevent garbage scan-out
+    I_PresentBlackFrame();
+#endif // __WIIU__
     D_AddFile(iwadfile);
     numiwadlumps = numlumps;
 
@@ -1834,6 +1838,10 @@ void D_DoomMain (void)
     DEH_ParseCommandLine();
 
     // Load PWAD files.
+#ifdef __WIIU__
+    // Present stable black frame before blocking PWAD load to prevent garbage scan-out
+    I_PresentBlackFrame();
+#endif // __WIIU__
     modifiedgame = W_ParseCommandLine();
 
     //!
