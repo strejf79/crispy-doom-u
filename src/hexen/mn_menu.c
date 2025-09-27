@@ -20,6 +20,9 @@
 #include <ctype.h>
 #include "h2def.h"
 #include "doomkeys.h"
+#ifdef __WIIU__
+#include "wiiu_exit.h"
+#endif // __WIIU__
 #include "i_input.h"
 #include "i_system.h"
 #include "i_swap.h"
@@ -1805,7 +1808,7 @@ boolean MN_Responder(event_t * event)
                 case 1:
                     G_CheckDemoStatus();
 #ifdef __WIIU__
-                    D_RequestAppExit();
+                    platform_request_exit();
                     return false;
 #else
                     I_Quit();

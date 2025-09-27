@@ -93,15 +93,8 @@
 //
 void D_DoomLoop (void);
 
-// Global flag for clean exit request from in-game quit menu
 #ifdef __WIIU__
-static boolean g_request_app_exit = false;
-
-// Function to request clean exit from in-game quit menu
-void D_RequestAppExit(void)
-{
-    g_request_app_exit = true;
-}
+#include "wiiu_exit.h"
 #endif // __WIIU__
 
 static boolean D_AddFile(char *filename);

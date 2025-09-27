@@ -27,6 +27,9 @@
 #include "dstrings.h"
 
 #include "d_main.h"
+#ifdef __WIIU__
+#include "wiiu_exit.h"
+#endif // __WIIU__
 #include "deh_main.h"
 
 #include "i_input.h"
@@ -1756,7 +1759,7 @@ void M_QuitResponse(int key)
     // [crispy] quit immediately if not showing exit screen
     if(!show_exitscreen || netgame)
 #ifdef __WIIU__
-        D_RequestAppExit();
+        platform_request_exit();
 #else
         I_Quit();
 #endif // __WIIU__
@@ -1787,7 +1790,7 @@ void M_QuitStrife(int choice)
     // [crispy] fast exit if "run" key is held down
     if (speedkeydown())
 #ifdef __WIIU__
-        D_RequestAppExit();
+        platform_request_exit();
 #else
         I_Quit();
 #endif // __WIIU__

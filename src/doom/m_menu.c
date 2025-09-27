@@ -27,6 +27,9 @@
 #include "dstrings.h"
 
 #include "d_main.h"
+#ifdef __WIIU__
+#include "wiiu_exit.h"
+#endif // __WIIU__
 #include "deh_main.h"
 
 #include "i_input.h"
@@ -1836,7 +1839,7 @@ void M_QuitResponse(int key)
 #ifdef __WIIU__
     // Request clean exit instead of calling I_Quit() directly
     // This allows ProcUI to handle the exit handshake properly
-    D_RequestAppExit();
+    platform_request_exit();
 #else
     I_Quit ();
 #endif // __WIIU__
@@ -1869,7 +1872,7 @@ void M_QuitDOOM(int choice)
     // [crispy] fast exit if "run" key is held down
     if (speedkeydown())
 #ifdef __WIIU__
-	D_RequestAppExit();
+	platform_request_exit();
 #else
 	I_Quit();
 #endif // __WIIU__

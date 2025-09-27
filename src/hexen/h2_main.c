@@ -95,15 +95,8 @@ static void CrispyDrawStats(void); // [crispy]
 GameMode_t gamemode;
 static const char *gamedescription;
 
-// Global flag for clean exit request from in-game quit menu
 #ifdef __WIIU__
-static boolean g_request_app_exit = false;
-
-// Function to request clean exit from in-game quit menu
-void D_RequestAppExit(void)
-{
-    g_request_app_exit = true;
-}
+#include "wiiu_exit.h"
 #endif // __WIIU__
 
 char *iwadfile;
