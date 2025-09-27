@@ -166,12 +166,27 @@ void launcherRun()
     // Launcher exit is handled by the main loop
     // No need for custom app running flag
 
-    // Cleanup launcher
+    // Clear buffers to black before shutdown to prevent garbage frames
+    OSScreenClearBufferEx(SCREEN_TV, 0x00000000);
+    OSScreenClearBufferEx(SCREEN_DRC, 0x00000000);
+    DCFlushRange(tvBuffer, tvBufferSize);
+    DCFlushRange(drcBuffer, drcBufferSize);
+    OSScreenFlipBuffersEx(SCREEN_TV);
+    OSScreenFlipBuffersEx(SCREEN_DRC);
+    
+    // Small delay to ensure the clear frames are displayed
+    OSSleepTicks(OSMillisecondsToTicks(50));
+
+    // Disable OSScreen before freeing buffers to prevent GPU from reading freed memory
+    OSScreenEnableEx(SCREEN_TV, false);
+    OSScreenEnableEx(SCREEN_DRC, false);
+    OSScreenShutdown();
+
+    // Now it's safe to free the buffers
     if (tvBuffer)
         free(tvBuffer);
     if (drcBuffer)
         free(drcBuffer);
-    //GX2Init(NULL);
 
     if (launcherRunning >= 0)
     {

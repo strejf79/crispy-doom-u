@@ -71,8 +71,8 @@ int main(int argc, char **argv)
     extern int launcherRunning;
     if (launcherRunning < 0)
     {
-        // Clean shutdown using wut wrapper
-        OSScreenShutdown();
+        // Clean shutdown using wut wrapper (only needed when quitting without selecting WAD)
+        // OSScreenShutdown() already called in launcherRun() for successful WAD selection
         WiiU_ShutdownJoystick();
         AXQuit();
         WHBProcShutdown();
