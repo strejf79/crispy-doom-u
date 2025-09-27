@@ -1544,6 +1544,13 @@ static void SetVideoMode(void)
                 SDL_GetError());
     }
 
+#ifdef __WIIU__
+    // Clear screen to prevent corruption during initialization
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+    SDL_RenderClear(renderer);
+    SDL_RenderPresent(renderer);
+#endif // __WIIU__
+
     // Important: Set the "logical size" of the rendering context. At the same
     // time this also defines the aspect ratio that is preserved while scaling
     // and stretching the texture into the window.

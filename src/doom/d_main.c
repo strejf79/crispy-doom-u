@@ -79,6 +79,9 @@
 
 #ifdef __WIIU__
 #include <whb/proc.h>
+#include <coreinit/screen.h>
+#include <sndcore2/core.h>
+#include "wiiu_controller.h"
 #endif // __WIIU__
 
 
@@ -612,26 +615,17 @@ void D_DoomLoop (void)
     }
 
 #ifdef __WIIU__
+    // Use wut's WHBProcIsRunning wrapper for simplified ProcUI handling
+    // Standard WHB pattern - let SDL and WHB handle everything
     while (WHBProcIsRunning())
-#else
-    while (1)
-#endif // __WIIU__
     {
         D_RunFrame();
     }
-
-#ifdef __WIIU__
-    extern int quitsounds2[8];
-    extern int quitsounds[8];
-
-    // From m_menu.c, M_QuitResponse
-    if (gamemode == commercial)
-        S_StartSound(NULL,quitsounds2[(gametic>>2)&7]);
-    else
-        S_StartSound(NULL,quitsounds[(gametic>>2)&7]);
-    I_WaitVBL(105);
-
-    I_Quit();
+#else
+    while (1)
+    {
+        D_RunFrame();
+    }
 #endif // __WIIU__
 }
 

@@ -28,7 +28,11 @@
 #include <vpad/input.h>
 #include <coreinit/screen.h>
 #include <coreinit/cache.h>
-#include <whb/proc.h>
+#include <coreinit/time.h>
+#include <coreinit/thread.h>
+#include <proc_ui/procui.h>
+#include <sysapp/launch.h>
+#include <gx2/state.h>
 
 #include "config.h"
 
@@ -135,11 +139,8 @@ void launcherRun()
     launcherMainInit();
     launcherNoWadsInit();
 
-    // I need this variable because with out it, WHBProcIsRunning becomes true
-    // again before exiting, causing a crash
-    bool wbhRunning = true;
-
-    while ((launcherRunning > 0) && (wbhRunning = WHBProcIsRunning()))
+    // Launcher loop - no ProcUI to avoid crashes
+    while (launcherRunning > 0)
     {
         // Poll input
         WiiU_PollJoystick();
@@ -157,17 +158,20 @@ void launcherRun()
 
         OSScreenFlipBuffersEx(SCREEN_TV);
         OSScreenFlipBuffersEx(SCREEN_DRC);
+        
+        // Small delay to prevent excessive CPU usage
+        OSSleepTicks(OSMillisecondsToTicks(16)); // ~60 FPS
     }
 
-    if (!wbhRunning)
-        launcherRunning = -1; // Quit
+    // Launcher exit is handled by the main loop
+    // No need for custom app running flag
 
     // Cleanup launcher
     if (tvBuffer)
         free(tvBuffer);
     if (drcBuffer)
         free(drcBuffer);
-    OSScreenShutdown();
+    //GX2Init(NULL);
 
     if (launcherRunning >= 0)
     {
@@ -177,12 +181,6 @@ void launcherRun()
     // Cleanup launcher states
     launcherMainCleanup();
     launcherNoWadsCleanup();
-
-    if (launcherRunning < 0)
-    {
-        WHBProcShutdown();
-        exit(0);
-    }
 }
 
 #endif // __WIIU__
