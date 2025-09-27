@@ -166,26 +166,12 @@ void launcherRun()
     // Launcher exit is handled by the main loop
     // No need for custom app running flag
 
-    // Clear buffers to black before shutdown to prevent garbage frames
-    OSScreenClearBufferEx(SCREEN_TV, 0x00000000);
-    OSScreenClearBufferEx(SCREEN_DRC, 0x00000000);
-    DCFlushRange(tvBuffer, tvBufferSize);
-    DCFlushRange(drcBuffer, drcBufferSize);
-    OSScreenFlipBuffersEx(SCREEN_TV);
-    OSScreenFlipBuffersEx(SCREEN_DRC);
-    
-    // Small delay to ensure the clear frames are displayed
-    OSSleepTicks(OSMillisecondsToTicks(50));
-
-    // Shutdown OSScreen before freeing buffers to prevent GPU from reading freed memory
-    // Don't disable displays - let SDL/GX2 take over them when the game starts
-    OSScreenShutdown();
-
-    // Now it's safe to free the buffers
+    // Cleanup launcher
     if (tvBuffer)
         free(tvBuffer);
     if (drcBuffer)
         free(drcBuffer);
+    //GX2Init(NULL);
 
     if (launcherRunning >= 0)
     {
