@@ -18,6 +18,8 @@
 
 
 #include "wiiu_exit.h"
+#include <proc_ui/procui.h>
+#include <sysapp/launch.h>
 
 // Global flag for clean exit request from in-game quit menu
 boolean g_request_app_exit = false;
@@ -26,4 +28,31 @@ boolean g_request_app_exit = false;
 void platform_request_exit(void)
 {
     g_request_app_exit = true;
+}
+
+// Manual ProcUI cleanup to ensure proper shutdown
+void cleanup_procui(void)
+{
+    if (ProcUIIsRunning()) {
+        if (!ProcUIInShutdown()) {
+            SYSLaunchMenu();
+            boolean still_running = true;
+            while (still_running) {
+                ProcUIStatus status = ProcUIProcessMessages(true);
+                switch (status) {
+                    case PROCUI_STATUS_EXITING:
+                        still_running = false;
+                        break;
+                    case PROCUI_STATUS_IN_FOREGROUND:
+                        break;
+                    case PROCUI_STATUS_IN_BACKGROUND:
+                        break;
+                    case PROCUI_STATUS_RELEASE_FOREGROUND:
+                        ProcUIDrawDoneRelease();
+                        break;
+                }
+            }
+        }
+        ProcUIShutdown();
+    }
 }

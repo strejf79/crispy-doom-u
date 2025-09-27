@@ -28,4 +28,7 @@ extern boolean g_request_app_exit;
 // Function to request clean exit from in-game quit menu
 void platform_request_exit(void);
 
+// Manual ProcUI cleanup function
+void cleanup_procui(void);
+
 #endif

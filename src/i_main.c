@@ -64,6 +64,10 @@ int main(int argc, char **argv)
     // Initialize wut's ProcUI wrapper
     WHBProcInit();
     
+    // Register manual ProcUI cleanup to ensure proper shutdown
+    extern void cleanup_procui(void);
+    atexit(cleanup_procui);
+    
     WiiU_InitJoystick();
     AXInit(); // Kill sounds
     launcherRun();
