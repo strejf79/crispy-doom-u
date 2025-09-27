@@ -529,6 +529,14 @@ void D_RunFrame()
     static int wipestart;
     static boolean wipe;
 
+#ifdef __WIIU__
+    // Check for exit request from in-game quit menu
+    if (g_request_app_exit)
+    {
+        return; // Exit immediately, main loop will handle cleanup
+    }
+#endif // __WIIU__
+
     if (wipe)
     {
         do

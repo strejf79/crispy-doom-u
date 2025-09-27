@@ -942,6 +942,10 @@ void H2_GameLoop(void)
     // Use wut's WHBProcIsRunning wrapper for simplified ProcUI handling
     while (WHBProcIsRunning() && !g_request_app_exit)
     {
+        // Check for exit request from in-game quit menu
+        if (g_request_app_exit)
+            break;
+            
         // Frame syncronous IO operations
         I_StartFrame();
 
