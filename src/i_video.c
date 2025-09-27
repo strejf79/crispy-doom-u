@@ -1510,10 +1510,19 @@ static void SetVideoMode(void)
     // Turn on vsync if we aren't in a -timedemo
     if (!singletics && mode.refresh_rate > 0)
     {
+#ifdef __WIIU__
+        // Force VSYNC on Wii U to prevent HOME menu hang issue
+        // When leaving foreground, GX2 silently restores swap interval to 1
+        // SDL doesn't reapply zero-interval mode after regaining foreground
+        // Keeping VSYNC enabled avoids this SDL bug
+        renderer_flags |= SDL_RENDERER_PRESENTVSYNC;
+        crispy->vsync = true; // Ensure config matches
+#else
         if (crispy->vsync) // [crispy] uncapped vsync
         {
             renderer_flags |= SDL_RENDERER_PRESENTVSYNC;
         }
+#endif // __WIIU__
     }
 
     if (force_software_renderer)

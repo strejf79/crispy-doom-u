@@ -1606,7 +1606,13 @@ static void CrispyVsyncHook(void)
 
 static void CrispyVsync(int option)
 {
+#ifdef __WIIU__
+    // Prevent disabling VSYNC on Wii U to avoid HOME menu hang issue
+    // SDL bug: GX2SetSwapInterval(0) causes black screen after HOME menu
+    return;
+#else
     crispy->post_rendering_hook = CrispyVsyncHook;
+#endif // __WIIU__
 }
 
 static void CrispyBrightmaps(int option)
