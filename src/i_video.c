@@ -67,6 +67,15 @@ void I_PresentBlackFrame(void) {
         SDL_RenderClear(renderer);
         SDL_RenderPresent(renderer);
         SDL_RenderPresent(renderer); // second call ensures both TV and GamePad buffers are valid
+        
+#ifdef __WIIU__
+        // Complete OSScreen shutdown now that SDL has presented its first frame
+        extern boolean WiiU_OSScreenShutdownPending(void);
+        extern void WiiU_OSScreenCompleteShutdown(void);
+        if (WiiU_OSScreenShutdownPending()) {
+            WiiU_OSScreenCompleteShutdown();
+        }
+#endif // __WIIU__
     }
 }
 

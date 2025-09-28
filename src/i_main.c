@@ -76,7 +76,8 @@ int main(int argc, char **argv)
     if (launcherRunning < 0)
     {
         // Clean shutdown using wut wrapper
-        OSScreenShutdown();
+        extern void WiiU_OSScreenCompleteShutdown(void);
+        WiiU_OSScreenCompleteShutdown(); // Use new shutdown system
         WiiU_ShutdownJoystick();
         AXQuit();
         WHBProcShutdown();

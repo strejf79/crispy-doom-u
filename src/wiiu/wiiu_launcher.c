@@ -42,6 +42,7 @@
 #include "wiiu_launcher_main.h"
 #include "wiiu_launcher_nowads.h"
 #include "wiiu_controller.h"
+#include "wiiu_oscreen.h"
 
 // Global variables
 int launcherRunning = 1; // 0 means go to game, -1 means quit
@@ -111,29 +112,8 @@ void generateArgcArgv()
 
 void launcherRun()
 {
-    // Init launcher
-    OSScreenInit();
-
-    size_t tvBufferSize = OSScreenGetBufferSizeEx(SCREEN_TV);
-    size_t drcBufferSize = OSScreenGetBufferSizeEx(SCREEN_DRC);
-
-    void *tvBuffer = memalign(0x100, tvBufferSize);
-    void *drcBuffer = memalign(0x100, drcBufferSize);
-
-    if (!tvBuffer || !drcBuffer)
-    {
-        OSScreenShutdown();
-        if (tvBuffer)
-            free(tvBuffer);
-        if (drcBuffer) // shouldn't happen?
-            free(drcBuffer);
-        I_Error("Error starting launcher, couldn't create OSScreen Buffers");
-    }
-
-    OSScreenSetBufferEx(SCREEN_TV, tvBuffer);
-    OSScreenSetBufferEx(SCREEN_DRC, drcBuffer);
-    OSScreenEnableEx(SCREEN_TV, true);
-    OSScreenEnableEx(SCREEN_DRC, true);
+    // Init launcher using new OSScreen management system
+    WiiU_OSScreenInit();
 
     // Init launcher states
     launcherMainInit();
@@ -153,8 +133,8 @@ void launcherRun()
         launcherDraw(SCREEN_TV);
         launcherDraw(SCREEN_DRC);
 
-        DCFlushRange(tvBuffer, tvBufferSize);
-        DCFlushRange(drcBuffer, drcBufferSize);
+        DCFlushRange(g_tvBuffer, g_tvBufferSize);
+        DCFlushRange(g_drcBuffer, g_drcBufferSize);
 
         OSScreenFlipBuffersEx(SCREEN_TV);
         OSScreenFlipBuffersEx(SCREEN_DRC);
@@ -166,12 +146,10 @@ void launcherRun()
     // Launcher exit is handled by the main loop
     // No need for custom app running flag
 
-    // Cleanup launcher
-    if (tvBuffer)
-        free(tvBuffer);
-    if (drcBuffer)
-        free(drcBuffer);
-    //GX2Init(NULL);
+    // Present clean frame and mark OSScreen for shutdown
+    // Actual shutdown will be completed after SDL presents its first frame
+    WiiU_OSScreenPresentCleanFrame();
+    WiiU_OSScreenMarkForShutdown();
 
     if (launcherRunning >= 0)
     {
