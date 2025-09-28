@@ -17,14 +17,19 @@ APP_AUTHOR	:= thearst3rd
 
 TOPDIR ?= $(CURDIR)
 
-# Force Windows-style paths for devkitPro
-export DEVKITPRO := C:/devkitPro
-export DEVKITPPC := C:/devkitPro/devkitPPC
+# Use environment variables for devkitPro paths
+ifeq ($(strip $(DEVKITPRO)),)
+$(error "Please set DEVKITPRO in your environment. export DEVKITPRO=<path to>/devkitpro")
+endif
+
+# Default to C:/devkitPro if not set, but allow override
+DEVKITPRO_PATH ?= C:/devkitPro
+export DEVKITPPC := $(DEVKITPRO_PATH)/devkitPPC
 
 # Override WUT_ROOT to use forward slashes (works on Windows)
-WUT_ROOT := $(DEVKITPRO)/wut
+WUT_ROOT := $(DEVKITPRO_PATH)/wut
 
-include $(DEVKITPRO)/wut/share/wut_rules
+include $(DEVKITPRO_PATH)/wut/share/wut_rules
 
 # Override RPXSPECS to use forward slashes (works on Windows)
 RPXSPECS := -specs=$(WUT_ROOT)/share/wut.specs
@@ -65,7 +70,7 @@ CXXFLAGS	:= $(CFLAGS)
 ASFLAGS	:=	-g $(ARCH)
 LDFLAGS	=	-g $(ARCH) $(RPXSPECS) -Wl,-Map,$(notdir $*.map)
 
-LIBS	:= -lSDL2_mixer `C:/devkitPro/portlibs/wiiu/bin/sdl2-config --libs` -lm -lstdc++ -lwut
+LIBS	:= -lSDL2_mixer `$(DEVKITPRO_PATH)/portlibs/wiiu/bin/sdl2-config --libs` -lm -lstdc++ -lwut
 
 #-------------------------------------------------------------------------------
 # list of directories containing libraries, this must be the top level
