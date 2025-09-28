@@ -65,7 +65,7 @@ CXXFLAGS	:= $(CFLAGS)
 ASFLAGS	:=	-g $(ARCH)
 LDFLAGS	=	-g $(ARCH) $(RPXSPECS) -Wl,-Map,$(notdir $*.map)
 
-LIBS	:= -lSDL2_mixer -lmpg123 -lmodplug -lvorbisidec -logg `C:/devkitPro/portlibs/wiiu/bin/sdl2-config --libs` -lm -lstdc++ -lwut
+LIBS	:= -lSDL2_mixer `C:/devkitPro/portlibs/wiiu/bin/sdl2-config --libs` -lm -lstdc++ -lwut
 
 #-------------------------------------------------------------------------------
 # list of directories containing libraries, this must be the top level
